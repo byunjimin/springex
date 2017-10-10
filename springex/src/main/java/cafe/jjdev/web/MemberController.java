@@ -1,5 +1,7 @@
 package cafe.jjdev.web;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import cafe.jjdev.web.service.Member;
 import cafe.jjdev.web.service.MemberDao;
+import cafe.jjdev.web.service.MemberService;
 
 @Controller
 public class MemberController {
@@ -16,9 +19,16 @@ public class MemberController {
 	@Autowired
 	private MemberDao memberDao;
 	
+	@Autowired
+	private MemberService memberService;
+	
+	
+	
 	@RequestMapping(value="/memberList")
-	public String memberList() {
+	public String memberList(Model model) {
 		System.out.println("List!!!!!!!");
+		List<Member> list = memberDao.selectMemberList();
+		model.addAttribute("list", list);
 		return "memberList";
 		//db에서 리스트 가져오기
 	}
@@ -26,7 +36,7 @@ public class MemberController {
 	@RequestMapping(value="/addMember", method = RequestMethod.POST)
 	public String addMember(MemberRequest memberRequest) {
 		System.out.println(memberRequest);
-		//db에 넣기
+		memberService.addMember(memberRequest);
 		return "redirect:/memberList"; // request.sendRedirect("/memberList") 
 		//redirect: ~ 여기로 재요청하겠다.
 		
