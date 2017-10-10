@@ -2,6 +2,8 @@ package cafe.jjdev.web;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +23,49 @@ public class MemberController {
 	
 	@Autowired
 	private MemberService memberService;
+	
+	//회원전용 페이지
+	@RequestMapping(value="/test")
+	public String test(HttpSession session) {
+		if(session.getAttribute("loginmember") == null) {
+			return "redirect:/login";
+		}
+		return "test";
+	}
+	
+	//로그아웃
+	@RequestMapping(value="/logout")
+	public String logout(HttpSession session) {
+		session.invalidate();
+		return "redirect:/login";
+	}
+	
+	
+	//로그인폼
+	@RequestMapping(value="/login", method = RequestMethod.GET)
+	public String loginform(HttpSession session) {
+		if(session.getAttribute("loginmember") == null) {
+		return "login";
+		}else {
+		return "redirect:/test";
+		}
+	}
+	
+	//로그인처리
+	@RequestMapping(value="/login", method = RequestMethod.POST)
+	public String loginform(Member member, HttpSession session) {
+		Member loginmember = memberDao.login(member);
+		System.out.println("loginmember>>>>>>>" + loginmember);
+		if(loginmember == null) {
+			
+			return "redirect:/login";
+		}else{
+			//session 로그인 정보를 저장
+			session.setAttribute("loginmember", loginmember);
+			return "redirect:/test";
+		}
+
+	}
 	
 	
 	
